@@ -8,6 +8,17 @@
 <style>
 body { font-family: Arial; background:#e8f5e9; }
 
+/* LOGIN */
+.login {
+  max-width:300px;
+  margin:auto;
+  margin-top:100px;
+  background:white;
+  padding:20px;
+  text-align:center;
+}
+
+/* MAIN */
 .container {
   max-width:900px;
   margin:auto;
@@ -15,6 +26,7 @@ body { font-family: Arial; background:#e8f5e9; }
   padding:20px;
 }
 
+/* INPUT */
 input, textarea {
   width:100%;
   padding:10px;
@@ -29,6 +41,7 @@ button {
   border:none;
 }
 
+/* PRESCRIPTION PAD */
 .pad {
   border:3px solid green;
   padding:20px;
@@ -36,34 +49,25 @@ button {
   position:relative;
 }
 
-/* Watermark */
+/* WATERMARK */
 .pad::before {
   content:"";
   position:absolute;
-  top:40%;
+  top:35%;
   left:50%;
-  transform:translate(-50%, -50%);
+  transform:translate(-50%,-50%);
   width:200px;
   height:200px;
   background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/200px-Dhanvantari.jpg') no-repeat center;
   background-size:contain;
-  opacity:0.08;
+  opacity:0.07;
 }
 
-/* PRINT ONLY PRESCRIPTION */
+/* PRINT */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  #output, #output * {
-    visibility: visible;
-  }
-  #output {
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-  }
+  body * { visibility:hidden; }
+  #output, #output * { visibility:visible; }
+  #output { position:absolute; top:0; left:0; width:100%; }
 }
 </style>
 
@@ -71,9 +75,20 @@ button {
 
 <body>
 
+<!-- LOGIN -->
+<div id="loginPage" class="login">
+<h3>Doctor Login</h3>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- MAIN -->
+<div id="mainPage" style="display:none">
+
 <div class="container">
 
-<h2>Digital Prescription</h2>
+<h2>Digital EMR</h2>
 
 <input id="name" placeholder="Patient Name">
 <input id="age" placeholder="Age">
@@ -87,12 +102,30 @@ button {
 <button onclick="generate()">Generate</button>
 <button onclick="window.print()">Print</button>
 
+<input id="search" placeholder="Search Patient" onkeyup="searchData()">
+
+<h3>History</h3>
+<div id="history"></div>
+
 <div id="output"></div>
 
+</div>
 </div>
 
 <script>
 
+// LOGIN
+function login(){
+if(user.value=="admin" && pass.value=="1234"){
+loginPage.style.display="none";
+mainPage.style.display="block";
+loadHistory();
+}else{
+alert("Wrong login");
+}
+}
+
+// GENERATE
 function generate(){
 
 let d = {
@@ -106,6 +139,7 @@ advice:advice.value,
 date:new Date().toLocaleDateString()
 };
 
+// OUTPUT = PRESCRIPTION PAD FORMAT
 output.innerHTML = `
 <div class="pad">
 
@@ -143,6 +177,35 @@ Not for Medical Legal Purpose
 </div>
 `;
 
+saveHistory(d);
+}
+
+// SAVE
+function saveHistory(d){
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+arr.push(d);
+localStorage.setItem("patients", JSON.stringify(arr));
+loadHistory();
+}
+
+// LOAD
+function loadHistory(){
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+history.innerHTML="";
+arr.forEach(p=>{
+history.innerHTML += `<p>${p.name} (${p.date})</p>`;
+});
+}
+
+// SEARCH
+function searchData(){
+let val = search.value.toLowerCase();
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+history.innerHTML="";
+arr.filter(p=>p.name.toLowerCase().includes(val))
+.forEach(p=>{
+history.innerHTML += `<p>${p.name} (${p.date})</p>`;
+});
 }
 
 </script>
