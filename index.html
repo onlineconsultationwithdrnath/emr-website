@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Premium EMR</title>
+<title>Digital Prescription</title>
 
 <style>
 body { font-family: Arial; background:#e8f5e9; }
@@ -41,33 +40,41 @@ button {
   border:none;
 }
 
-/* PRESCRIPTION PAD */
+/* PAD DESIGN */
 .pad {
-  border:3px solid green;
-  padding:20px;
+  border:3px solid #166534;
+  padding:25px;
   margin-top:20px;
+  background:#f0fdf4;
   position:relative;
 }
 
-/* WATERMARK */
-.pad::before {
-  content:"";
-  position:absolute;
-  top:35%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:200px;
-  height:200px;
-  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/200px-Dhanvantari.jpg') no-repeat center;
-  background-size:contain;
-  opacity:0.07;
+/* HEADER */
+.header {
+  display:flex;
+  justify-content:space-between;
+  border-bottom:2px solid green;
+  padding-bottom:10px;
 }
 
-/* PRINT */
+/* FOOTER */
+.footer {
+  display:flex;
+  justify-content:space-between;
+  margin-top:30px;
+  font-size:12px;
+}
+
+/* PRINT ONLY PAD */
 @media print {
   body * { visibility:hidden; }
   #output, #output * { visibility:visible; }
-  #output { position:absolute; top:0; left:0; width:100%; }
+  #output {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+  }
 }
 </style>
 
@@ -102,11 +109,6 @@ button {
 <button onclick="generate()">Generate</button>
 <button onclick="window.print()">Print</button>
 
-<input id="search" placeholder="Search Patient" onkeyup="searchData()">
-
-<h3>History</h3>
-<div id="history"></div>
-
 <div id="output"></div>
 
 </div>
@@ -119,13 +121,12 @@ function login(){
 if(user.value=="admin" && pass.value=="1234"){
 loginPage.style.display="none";
 mainPage.style.display="block";
-loadHistory();
 }else{
 alert("Wrong login");
 }
 }
 
-// GENERATE
+// GENERATE PRESCRIPTION
 function generate(){
 
 let d = {
@@ -139,22 +140,35 @@ advice:advice.value,
 date:new Date().toLocaleDateString()
 };
 
-// OUTPUT = PRESCRIPTION PAD FORMAT
 output.innerHTML = `
 <div class="pad">
 
-<div style="display:flex; justify-content:space-between;">
-<div>
-<b>Dr. Ashis Kumar Nath</b><br>
-BAMS, Clinical Panchkarma Specialist
-</div>
-<div>
-Timing: 11AM - 5PM<br>
-Sunday Closed
-</div>
+<!-- WATERMARK -->
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/512px-Dhanvantari.jpg"
+style="
+position:absolute;
+top:45%;
+left:50%;
+transform:translate(-50%,-50%);
+width:220px;
+opacity:0.06;
+">
+
+<!-- CONTENT -->
+<div style="position:relative;">
+
+<div class="header">
+  <div>
+    <b>Dr. Ashis Kumar Nath</b><br>
+    BAMS, Clinical Panchkarma Specialist
+  </div>
+  <div style="text-align:right;">
+    Timing: 11 AM – 5 PM<br>
+    Sunday Closed
+  </div>
 </div>
 
-<hr>
+<br>
 
 <p><b>Name:</b> ${d.name}</p>
 <p><b>Age:</b> ${d.age}</p>
@@ -163,49 +177,19 @@ Sunday Closed
 
 <hr>
 
-<p><b>Chief Complaint:</b> ${d.cc}</p>
-<p><b>Diagnosis:</b> ${d.dx}</p>
-<p><b>Medicines:</b> ${d.med}</p>
-<p><b>Advice:</b> ${d.advice}</p>
+<p><b>Chief Complaint:</b><br>${d.cc}</p>
+<p><b>Diagnosis:</b><br>${d.dx}</p>
+<p><b>Medicines:</b><br>${d.med}</p>
+<p><b>Advice:</b><br>${d.advice}</p>
 
-<br>
-
-<p style="text-align:center;font-size:12px;">
-Not for Medical Legal Purpose
-</p>
+<div class="footer">
+  <div></div>
+  <div>Not for Medical Legal Purpose</div>
+</div>
 
 </div>
+</div>
 `;
-
-saveHistory(d);
-}
-
-// SAVE
-function saveHistory(d){
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-arr.push(d);
-localStorage.setItem("patients", JSON.stringify(arr));
-loadHistory();
-}
-
-// LOAD
-function loadHistory(){
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-history.innerHTML="";
-arr.forEach(p=>{
-history.innerHTML += `<p>${p.name} (${p.date})</p>`;
-});
-}
-
-// SEARCH
-function searchData(){
-let val = search.value.toLowerCase();
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-history.innerHTML="";
-arr.filter(p=>p.name.toLowerCase().includes(val))
-.forEach(p=>{
-history.innerHTML += `<p>${p.name} (${p.date})</p>`;
-});
 }
 
 </script>
