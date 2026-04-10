@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,17 +8,6 @@
 <style>
 body { font-family: Arial; background:#e8f5e9; }
 
-/* LOGIN */
-.login {
-  max-width:300px;
-  margin:auto;
-  margin-top:100px;
-  background:white;
-  padding:20px;
-  text-align:center;
-}
-
-/* MAIN */
 .container {
   max-width:900px;
   margin:auto;
@@ -25,7 +15,6 @@ body { font-family: Arial; background:#e8f5e9; }
   padding:20px;
 }
 
-/* INPUT */
 input, textarea {
   width:100%;
   padding:10px;
@@ -40,16 +29,16 @@ button {
   border:none;
 }
 
-/* PAD DESIGN */
+/* PRESCRIPTION PAD */
 .pad {
-  border:3px solid #166534;
-  padding:25px;
+  border:2px solid green;
+  padding:20px;
   margin-top:20px;
-  background:#f0fdf4;
   position:relative;
+  background:#f0fdf4;
 }
 
-/* HEADER */
+/* HEADER FIXED */
 .header {
   display:flex;
   justify-content:space-between;
@@ -57,11 +46,20 @@ button {
   padding-bottom:10px;
 }
 
+/* WATERMARK IMAGE */
+.watermark {
+  position:absolute;
+  top:45%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:200px;
+  opacity:0.08;
+}
+
 /* FOOTER */
 .footer {
-  display:flex;
-  justify-content:space-between;
-  margin-top:30px;
+  text-align:right;
+  margin-top:20px;
   font-size:12px;
 }
 
@@ -82,20 +80,9 @@ button {
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginPage" class="login">
-<h3>Doctor Login</h3>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-</div>
-
-<!-- MAIN -->
-<div id="mainPage" style="display:none">
-
 <div class="container">
 
-<h2>Digital EMR</h2>
+<h2>Digital Prescription</h2>
 
 <input id="name" placeholder="Patient Name">
 <input id="age" placeholder="Age">
@@ -108,25 +95,14 @@ button {
 
 <button onclick="generate()">Generate</button>
 <button onclick="window.print()">Print</button>
+<button onclick="download()">Download</button>
 
 <div id="output"></div>
 
 </div>
-</div>
 
 <script>
 
-// LOGIN
-function login(){
-if(user.value=="admin" && pass.value=="1234"){
-loginPage.style.display="none";
-mainPage.style.display="block";
-}else{
-alert("Wrong login");
-}
-}
-
-// GENERATE PRESCRIPTION
 function generate(){
 
 let d = {
@@ -144,28 +120,17 @@ output.innerHTML = `
 <div class="pad">
 
 <!-- WATERMARK -->
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/512px-Dhanvantari.jpg"
-style="
-position:absolute;
-top:45%;
-left:50%;
-transform:translate(-50%,-50%);
-width:220px;
-opacity:0.06;
-">
+<img class="watermark" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/512px-Dhanvantari.jpg">
 
-<!-- CONTENT -->
-<div style="position:relative;">
-
+<!-- HEADER -->
 <div class="header">
-  <div>
-    <b>Dr. Ashis Kumar Nath</b><br>
-    BAMS, Clinical Panchkarma Specialist
-  </div>
-  <div style="text-align:right;">
-    Timing: 11 AM – 5 PM<br>
-    Sunday Closed
-  </div>
+<div>
+<b>Dr. Ashis Kumar Nath</b><br>
+BAMS, Clinical Panchkarma Specialist
+</div>
+<div>
+11AM – 5PM<br>Sunday Closed
+</div>
 </div>
 
 <br>
@@ -183,13 +148,21 @@ opacity:0.06;
 <p><b>Advice:</b><br>${d.advice}</p>
 
 <div class="footer">
-  <div></div>
-  <div>Not for Medical Legal Purpose</div>
+Not for Medical Legal Purpose
 </div>
 
 </div>
-</div>
 `;
+}
+
+/* DOWNLOAD FUNCTION */
+function download(){
+let content = document.getElementById("output").innerHTML;
+let blob = new Blob([content], {type:"text/html"});
+let a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "prescription.html";
+a.click();
 }
 
 </script>
