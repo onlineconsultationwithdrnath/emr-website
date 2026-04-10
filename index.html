@@ -2,18 +2,34 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Digital Prescription</title>
+<title>Premium EMR</title>
 
 <style>
 body { font-family: Arial; background:#e8f5e9; }
-.container { max-width:800px; margin:auto; background:white; padding:20px; }
+
+.container {
+  max-width:900px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:10px;
+}
+
+h2 { color:green; }
 
 input, textarea {
-  width:100%; padding:8px; margin:5px 0;
+  width:100%;
+  padding:10px;
+  margin:5px 0;
 }
 
 button {
-  padding:10px; background:green; color:white; border:none;
+  padding:10px;
+  margin:5px;
+  background:green;
+  color:white;
+  border:none;
+  cursor:pointer;
 }
 
 .pad {
@@ -21,11 +37,29 @@ button {
   padding:20px;
   margin-top:20px;
 }
+
+.login {
+  max-width:300px;
+  margin:auto;
+  margin-top:100px;
+  background:white;
+  padding:20px;
+  text-align:center;
+}
 </style>
 
 </head>
 
 <body>
+
+<div id="loginPage" class="login">
+<h3>Doctor Login</h3>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<div id="mainPage" style="display:none">
 
 <div class="container">
 
@@ -41,13 +75,33 @@ button {
 <textarea id="advice" placeholder="Advice"></textarea>
 
 <button onclick="generate()">Generate</button>
+<button onclick="printData()">Print</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
+<input id="search" placeholder="Search Patient" onkeyup="searchData()">
 
 <div id="output"></div>
 
+<h3>Patient History</h3>
+<div id="history"></div>
+
+</div>
 </div>
 
 <script>
 
+// LOGIN
+function login(){
+if(user.value=="admin" && pass.value=="1234"){
+loginPage.style.display="none";
+mainPage.style.display="block";
+}
+else{
+alert("Wrong login");
+}
+}
+
+// GENERATE
 function generate(){
 
 let d = {
@@ -63,34 +117,66 @@ date:new Date().toLocaleDateString()
 
 output.innerHTML = `
 <div class="pad">
-
 <h3>Dr. Ashis Kumar Nath</h3>
 <p>BAMS, Clinical Panchkarma Specialist</p>
-
 <hr>
-
 <p><b>Name:</b> ${d.name}</p>
 <p><b>Age:</b> ${d.age}</p>
 <p><b>Date:</b> ${d.date}</p>
 <p><b>Address:</b> ${d.address}</p>
-
 <hr>
-
 <p><b>Chief Complaint:</b> ${d.cc}</p>
 <p><b>Diagnosis:</b> ${d.dx}</p>
 <p><b>Medicines:</b> ${d.med}</p>
 <p><b>Advice:</b> ${d.advice}</p>
-
-<br>
-
-<p style="text-align:center; font-size:12px;">
+<p style="text-align:center;font-size:12px;">
 Not for Medical Legal Purpose
 </p>
-
 </div>
 `;
 
+saveHistory(d);
 }
+
+// SAVE HISTORY
+function saveHistory(data){
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+arr.push(data);
+localStorage.setItem("patients", JSON.stringify(arr));
+loadHistory();
+}
+
+// LOAD HISTORY
+function loadHistory(){
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+history.innerHTML="";
+arr.forEach(p=>{
+history.innerHTML += `<p>${p.name} - ${p.date}</p>`;
+});
+}
+
+// SEARCH
+function searchData(){
+let val = search.value.toLowerCase();
+let arr = JSON.parse(localStorage.getItem("patients") || "[]");
+history.innerHTML="";
+arr.filter(p=>p.name.toLowerCase().includes(val))
+.forEach(p=>{
+history.innerHTML += `<p>${p.name} - ${p.date}</p>`;
+});
+}
+
+// PRINT
+function printData(){
+window.print();
+}
+
+// PDF DOWNLOAD
+function downloadPDF(){
+alert("Use Print → Save as PDF");
+}
+
+loadHistory();
 
 </script>
 
