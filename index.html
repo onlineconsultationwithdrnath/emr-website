@@ -1,1 +1,98 @@
-https://onlineconsultationwithdrnath.github.io/emr-website/
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Digital Prescription</title>
+
+<style>
+body { font-family: Arial; background:#e8f5e9; }
+.container { max-width:800px; margin:auto; background:white; padding:20px; }
+
+input, textarea {
+  width:100%; padding:8px; margin:5px 0;
+}
+
+button {
+  padding:10px; background:green; color:white; border:none;
+}
+
+.pad {
+  border:3px solid green;
+  padding:20px;
+  margin-top:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Digital Prescription</h2>
+
+<input id="name" placeholder="Patient Name">
+<input id="age" placeholder="Age">
+<input id="address" placeholder="Address">
+
+<textarea id="cc" placeholder="Chief Complaint"></textarea>
+<textarea id="dx" placeholder="Diagnosis"></textarea>
+<textarea id="med" placeholder="Medicines"></textarea>
+<textarea id="advice" placeholder="Advice"></textarea>
+
+<button onclick="generate()">Generate</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+function generate(){
+
+let d = {
+name:name.value,
+age:age.value,
+address:address.value,
+cc:cc.value,
+dx:dx.value,
+med:med.value,
+advice:advice.value,
+date:new Date().toLocaleDateString()
+};
+
+output.innerHTML = `
+<div class="pad">
+
+<h3>Dr. Ashis Kumar Nath</h3>
+<p>BAMS, Clinical Panchkarma Specialist</p>
+
+<hr>
+
+<p><b>Name:</b> ${d.name}</p>
+<p><b>Age:</b> ${d.age}</p>
+<p><b>Date:</b> ${d.date}</p>
+<p><b>Address:</b> ${d.address}</p>
+
+<hr>
+
+<p><b>Chief Complaint:</b> ${d.cc}</p>
+<p><b>Diagnosis:</b> ${d.dx}</p>
+<p><b>Medicines:</b> ${d.med}</p>
+<p><b>Advice:</b> ${d.advice}</p>
+
+<br>
+
+<p style="text-align:center; font-size:12px;">
+Not for Medical Legal Purpose
+</p>
+
+</div>
+`;
+
+}
+
+</script>
+
+</body>
+</html>
