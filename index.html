@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,10 +13,7 @@ body { font-family: Arial; background:#e8f5e9; }
   margin:auto;
   background:white;
   padding:20px;
-  border-radius:10px;
 }
-
-h2 { color:green; }
 
 input, textarea {
   width:100%;
@@ -29,37 +27,49 @@ button {
   background:green;
   color:white;
   border:none;
-  cursor:pointer;
 }
 
 .pad {
   border:3px solid green;
   padding:20px;
   margin-top:20px;
+  position:relative;
 }
 
-.login {
-  max-width:300px;
-  margin:auto;
-  margin-top:100px;
-  background:white;
-  padding:20px;
-  text-align:center;
+/* Watermark */
+.pad::before {
+  content:"";
+  position:absolute;
+  top:40%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  width:200px;
+  height:200px;
+  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Dhanvantari.jpg/200px-Dhanvantari.jpg') no-repeat center;
+  background-size:contain;
+  opacity:0.08;
+}
+
+/* PRINT ONLY PRESCRIPTION */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #output, #output * {
+    visibility: visible;
+  }
+  #output {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+  }
 }
 </style>
 
 </head>
 
 <body>
-
-<div id="loginPage" class="login">
-<h3>Doctor Login</h3>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-</div>
-
-<div id="mainPage" style="display:none">
 
 <div class="container">
 
@@ -75,33 +85,14 @@ button {
 <textarea id="advice" placeholder="Advice"></textarea>
 
 <button onclick="generate()">Generate</button>
-<button onclick="printData()">Print</button>
-<button onclick="downloadPDF()">Download PDF</button>
-
-<input id="search" placeholder="Search Patient" onkeyup="searchData()">
+<button onclick="window.print()">Print</button>
 
 <div id="output"></div>
 
-<h3>Patient History</h3>
-<div id="history"></div>
-
-</div>
 </div>
 
 <script>
 
-// LOGIN
-function login(){
-if(user.value=="admin" && pass.value=="1234"){
-loginPage.style.display="none";
-mainPage.style.display="block";
-}
-else{
-alert("Wrong login");
-}
-}
-
-// GENERATE
 function generate(){
 
 let d = {
@@ -117,66 +108,42 @@ date:new Date().toLocaleDateString()
 
 output.innerHTML = `
 <div class="pad">
-<h3>Dr. Ashis Kumar Nath</h3>
-<p>BAMS, Clinical Panchkarma Specialist</p>
+
+<div style="display:flex; justify-content:space-between;">
+<div>
+<b>Dr. Ashis Kumar Nath</b><br>
+BAMS, Clinical Panchkarma Specialist
+</div>
+<div>
+Timing: 11AM - 5PM<br>
+Sunday Closed
+</div>
+</div>
+
 <hr>
+
 <p><b>Name:</b> ${d.name}</p>
 <p><b>Age:</b> ${d.age}</p>
 <p><b>Date:</b> ${d.date}</p>
 <p><b>Address:</b> ${d.address}</p>
+
 <hr>
+
 <p><b>Chief Complaint:</b> ${d.cc}</p>
 <p><b>Diagnosis:</b> ${d.dx}</p>
 <p><b>Medicines:</b> ${d.med}</p>
 <p><b>Advice:</b> ${d.advice}</p>
+
+<br>
+
 <p style="text-align:center;font-size:12px;">
 Not for Medical Legal Purpose
 </p>
+
 </div>
 `;
 
-saveHistory(d);
 }
-
-// SAVE HISTORY
-function saveHistory(data){
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-arr.push(data);
-localStorage.setItem("patients", JSON.stringify(arr));
-loadHistory();
-}
-
-// LOAD HISTORY
-function loadHistory(){
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-history.innerHTML="";
-arr.forEach(p=>{
-history.innerHTML += `<p>${p.name} - ${p.date}</p>`;
-});
-}
-
-// SEARCH
-function searchData(){
-let val = search.value.toLowerCase();
-let arr = JSON.parse(localStorage.getItem("patients") || "[]");
-history.innerHTML="";
-arr.filter(p=>p.name.toLowerCase().includes(val))
-.forEach(p=>{
-history.innerHTML += `<p>${p.name} - ${p.date}</p>`;
-});
-}
-
-// PRINT
-function printData(){
-window.print();
-}
-
-// PDF DOWNLOAD
-function downloadPDF(){
-alert("Use Print → Save as PDF");
-}
-
-loadHistory();
 
 </script>
 
